@@ -56,16 +56,18 @@
                         direction: 'center',
                     });
                     const ROUNDING = 10000;
-                    const per_cap = Math.round((feature.properties.covid_case_count / feature.properties.population + Number.EPSILON) * ROUNDING) / ROUNDING;
+                    const per_cap_mult = 1000;
+                    const per_cap = feature.properties.covid_case_count / feature.properties.population * per_cap_mult;
+                    const per_cap_rounded = Math.round((per_cap + Number.EPSILON) * ROUNDING) / ROUNDING;
                     layer.bindPopup(`<dl>
                         <dt>Total COVID-19 Cases</dt>
                         <dd>${feature.properties.covid_case_count}</dd>
 
-                        <dt>Population (2016)</dt>
+                        <dt>Population (2016 Census Data)</dt>
                         <dd>${feature.properties.population}</dd>
 
-                        <dt>Cases Per Capita (2016)</dt>
-                        <dd>${per_cap}</dd>
+                        <dt>Cases Per ${per_cap_mult} People (2016 Census Data)</dt>
+                        <dd>${per_cap_rounded}</dd>
                     </dl>`);
                 }
             }
