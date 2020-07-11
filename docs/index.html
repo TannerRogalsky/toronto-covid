@@ -36,8 +36,8 @@
     <div id="mapid"></div>
 
     <script type="text/javascript">
-        const latlong = [43.676919267899997, -79.425514946999996];
-        const mymap = L.map('mapid').setView(latlong, 13);
+        const latlong = [43.7, -79.4];
+        const mymap = L.map('mapid').setView(latlong, 12);
 
         L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
             attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
@@ -51,15 +51,12 @@
         fetch("out.geojson").then(e => e.json()).then(e => {
             const onEachFeature = function onEachFeature(feature, layer) {
                 if (feature.properties && feature.properties.covid_case_count) {
-                    layer.bindTooltip(`<span>${feature.properties.covid_case_count}</span>`, {
-                        permanent: true,
-                        direction: 'center',
-                    });
                     const ROUNDING = 10000;
                     const per_cap_mult = 1000;
                     const per_cap = feature.properties.covid_case_count / feature.properties.population * per_cap_mult;
                     const per_cap_rounded = Math.round((per_cap + Number.EPSILON) * ROUNDING) / ROUNDING;
-                    layer.bindPopup(`<dl>
+                    layer.bindPopup(`<h2>${feature.properties.AREA_NAME}</h2>
+                    <dl>
                         <dt>Total COVID-19 Cases</dt>
                         <dd>${feature.properties.covid_case_count}</dd>
 
@@ -75,6 +72,15 @@
             L.geoJSON(e.features, {
                 onEachFeature
             }).addTo(mymap);
+            e.features.forEach(feature => {
+                let lat = feature.properties.LATITUDE;
+                let long = feature.properties.LONGITUDE;
+                let radius = feature.properties.covid_case_count; // MAGIC
+                new L.circle([lat, long], radius, {
+                    color: "red",
+                    interactive: false,
+                }).addTo(mymap);
+            });
         })
     </script>
 </body>
