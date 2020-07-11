@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Toronto COVID</title>
+	<link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css"
+       integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
+       crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"
+       integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew=="
+       crossorigin=""></script>
+    <style type="text/css">
+        html, body {
+            height: 100%;
+            box-sizing: border-box;
+            margin: 0;
+        }
+        #mapid { 
+            height: 100%; 
+        }
+    </style>
+</head>
+<body>
+    <div id="mapid"></div>
+
+    <script type="text/javascript">
+        const latlong = [43.676919267899997, -79.425514946999996];
+        const mymap = L.map('mapid').setView(latlong, 13);
+
+        L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
+            attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+            maxZoom: 18,
+            id: 'mapbox/streets-v11',
+            tileSize: 512,
+            zoomOffset: -1,
+            accessToken: 'pk.eyJ1IjoidGFubmVycm9nYWxza3kiLCJhIjoiY2tjaG55c2F6MG56bjJwbGl4aGxqeWRsZCJ9.PYRNhBu7MLVD8kgVniE6Lg'
+        }).addTo(mymap);
+
+        fetch("out.geojson").then(e => e.json()).then(e => {
+            const onEachFeature = function onEachFeature(feature, layer) {
+                if (feature.properties && feature.properties.covid_case_count) {
+                    layer.bindTooltip(`<p>${feature.properties.covid_case_count}</p>`, {
+                        permanent: true,
+                        direction: 'center',
+                    });
+                }
+            }
+
+            L.geoJSON(e.features, {
+                onEachFeature
+            }).addTo(mymap);
+        })
+    </script>
+</body>
+</html>
